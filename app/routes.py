@@ -1,8 +1,8 @@
 from app import app, db
+from app.forms import LoginForm, RegistrationForm, EditNoteForm
+from app.models import User, Note
 from flask import render_template, flash, redirect, url_for
-from app.forms import LoginForm, RegistrationForm
-from app.models import User
-from flask_login import current_user, login_user, logout_user
+from flask_login import current_user, login_user, logout_user, login_required
 
 @app.route('/')
 @app.route('/index')
@@ -42,3 +42,16 @@ def register():
 		return redirect(url_for('login'))
 	return render_template('register.html', form=form)
 
+@app.route('/notes', methods=['GET', 'POST'])
+@login_required
+def notes():
+	user = User.query.filter_by(username=current_user.username).first()
+	notes = Note.query.filter_by(user_id=user.id).all()
+	form = EditNoteForm()
+	if form.validate_on_submit():
+		note = Note(title=form.title.data, body=form.body.data, user_id=user.id)
+		db.session.add(note)
+		db.session.commit()
+		flash('Created new note. Title: {}'.format(form.title.data))
+		return redirect(url_for('notes'))
+	return render_template('notes.html', user=user, form=form, notes=notes)
