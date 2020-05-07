@@ -21,8 +21,9 @@
 	</form>	
 	<hr>
 	{% for note in notes %}
-		<p><b>{{ note.title }}</b><br></p>
-		<p>{{ note.body }}</p>
+		<p>{{ note.timestamp.replace(microsecond=0) }} - <b>{{ note.title }}</b><br></p>
+		<pre>{{ note.body }}</pre>
+		
 		<hr>
 	{% endfor %}
 {% endblock %}

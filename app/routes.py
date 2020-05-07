@@ -42,12 +42,20 @@ def register():
 		return redirect(url_for('login'))
 	return render_template('register.html', form=form)
 
-@app.route('/notes', methods=['GET', 'POST'])
+@app.route('/notes', defaults={'note_id': None}, methods=['GET', 'POST'])
+@app.route('/notes/id=<note_id>', methods=['GET', 'POST'])
 @login_required
-def notes():
+def notes(note_id):
 	user = User.query.filter_by(username=current_user.username).first()
-	notes = Note.query.filter_by(user_id=user.id).all()
+	notes = Note.query.filter_by(user_id=user.id).order_by(Note.timestamp.desc()).all()
 	form = EditNoteForm()
+	if note_id is not None:
+		edited_note = Note.query.filter_by(id=note_id).first()
+		if edited_note is not None:
+			form.title.data = edited_note.title
+			form.body.data = edited_note.body
+		else:
+			return redirect(url_for('notes'))
 	if form.validate_on_submit():
 		note = Note(title=form.title.data, body=form.body.data, user_id=user.id)
 		db.session.add(note)

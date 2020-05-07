@@ -31,4 +31,4 @@ class Note(db.Model):
 	user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
 	def __repr__(self):
-		return '<Note {}>'.format(self.body)
+		return '<Note {}>'.format(self.title)
