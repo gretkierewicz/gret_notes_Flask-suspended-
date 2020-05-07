@@ -1,7 +1,7 @@
 from app import app, db
 from app.forms import LoginForm, RegistrationForm, EditNoteForm
 from app.models import User, Note
-from flask import render_template, flash, redirect, url_for
+from flask import render_template, flash, redirect, url_for, request
 from flask_login import current_user, login_user, logout_user, login_required
 
 @app.route('/')
@@ -42,15 +42,15 @@ def register():
 		return redirect(url_for('login'))
 	return render_template('register.html', form=form)
 
-@app.route('/notes', defaults={'note_id': None}, methods=['GET', 'POST'])
-@app.route('/notes/id=<note_id>', methods=['GET', 'POST'])
+@app.route('/notes', methods=['GET', 'POST'])
 @login_required
-def notes(note_id):
+def notes():
+	note_id = request.args.get('note', None, type=int)
 	user = User.query.filter_by(username=current_user.username).first()
-	notes = Note.query.filter_by(user_id=user.id).order_by(Note.timestamp.desc()).all()
+	notes = user.notes.order_by(Note.timestamp.desc()).all()
 	form = EditNoteForm()
 	if note_id is not None:
-		edited_note = Note.query.filter_by(id=note_id).first()
+		edited_note = user.notes.filter_by(id=note_id).first()
 		if edited_note is not None:
 			form.title.data = edited_note.title
 			form.body.data = edited_note.body

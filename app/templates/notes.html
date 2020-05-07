@@ -17,13 +17,10 @@
 			<span style="color: red;">[{{ error }}]</span>
 		{% endfor %}
 		</p>
-		<p>{{ form.submit() }}</p>
+		<p>{{ form.submit(label="New note") }}</p>
 	</form>	
 	<hr>
 	{% for note in notes %}
-		<p>{{ note.timestamp.replace(microsecond=0) }} - <b>{{ note.title }}</b><br></p>
-		<pre>{{ note.body }}</pre>
-		
-		<hr>
+		{% include '_note.html' %}
 	{% endfor %}
 {% endblock %}
