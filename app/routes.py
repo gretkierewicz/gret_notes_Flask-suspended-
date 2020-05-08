@@ -1,6 +1,7 @@
 from app import app, db
 from app.forms import LoginForm, RegistrationForm, EditNoteForm
 from app.models import User, Note
+from datetime import datetime
 from flask import render_template, flash, redirect, url_for, request
 from flask_login import current_user, login_user, logout_user, login_required
 
@@ -45,21 +46,38 @@ def register():
 @app.route('/notes', methods=['GET', 'POST'])
 @login_required
 def notes():
-	note_id = request.args.get('note', None, type=int)
+	note_id = request.args.get('note_id', None, type=int)
+	edit_flag = request.args.get('edit_flag', False, type=bool)
 	user = User.query.filter_by(username=current_user.username).first()
 	notes = user.notes.order_by(Note.timestamp.desc()).all()
 	form = EditNoteForm()
-	if note_id is not None:
-		edited_note = user.notes.filter_by(id=note_id).first()
-		if edited_note is not None:
-			form.title.data = edited_note.title
-			form.body.data = edited_note.body
+
+	if form.validate_on_submit():
+		if edit_flag == True and note_id is None:
+			note = Note(title=form.title.data, body=form.body.data, user_id=user.id)
+			db.session.add(note)
+			db.session.commit()
+			flash('Created new note. Title: {}'.format(note.title))
+			return redirect(url_for('notes'))
+		elif edit_flag == True and note_id is not None:
+			note = user.notes.filter_by(id=note_id).first()
+			if note is not None:
+				note.title = form.title.data
+				note.body = form.body.data
+				db.session.commit()
+				flash('Saved changes to note. Title: {}'.format(note.title))
+			else:
+				flash('Cannot find note!')
+			return redirect(url_for('notes'))
 		else:
 			return redirect(url_for('notes'))
-	if form.validate_on_submit():
-		note = Note(title=form.title.data, body=form.body.data, user_id=user.id)
-		db.session.add(note)
-		db.session.commit()
-		flash('Created new note. Title: {}'.format(form.title.data))
-		return redirect(url_for('notes'))
-	return render_template('notes.html', user=user, form=form, notes=notes)
+	elif request.method == 'GET' and note_id is not None:
+		note = user.notes.filter_by(id=note_id).first()
+		if note is not None:
+			form.title.data = note.title
+			form.body.data = note.body
+		else:
+			return redirect(url_for('notes', edit_flag=Flase))
+
+	return render_template('notes.html', form=form, notes=notes, note_id=note_id, edit_flag=edit_flag)
+
