@@ -48,8 +48,11 @@ def register():
 def notes():
 	note_id = request.args.get('note_id', None, type=int)
 	edit_flag = request.args.get('edit_flag', False, type=bool)
+	del_flag = request.args.get('del_flag', False, type=bool)
+
 	user = User.query.filter_by(username=current_user.username).first()
 	notes = user.notes.order_by(Note.timestamp.desc()).all()
+
 	form = EditNoteForm()
 
 	if form.validate_on_submit():
@@ -67,7 +70,7 @@ def notes():
 				db.session.commit()
 				flash('Saved changes to note. Title: {}'.format(note.title))
 			else:
-				flash('Cannot find note!')
+				flash('Note not found')
 			return redirect(url_for('notes'))
 		else:
 			return redirect(url_for('notes'))
@@ -79,5 +82,22 @@ def notes():
 		else:
 			return redirect(url_for('notes', edit_flag=Flase))
 
-	return render_template('notes.html', form=form, notes=notes, note_id=note_id, edit_flag=edit_flag)
+	return render_template(
+		'notes.html',
+		form=form,
+		notes=notes,
+		note_id=note_id,
+		edit_flag=edit_flag,
+		del_flag=del_flag)
 
+@app.route('/del_note/<note_id>')
+@login_required
+def del_note(note_id):
+	note = current_user.notes.filter_by(id=note_id).first()
+	if note is not None:
+		flash('Deleted note: {}'.format(note.title))
+		db.session.delete(note)
+		db.session.commit()
+	else:
+		flash('Note not found')
+	return redirect(url_for('notes'))

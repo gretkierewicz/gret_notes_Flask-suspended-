@@ -35,3 +35,4 @@ class EditNoteForm(FlaskForm):
 	title = StringField('Title', validators=[DataRequired()])
 	body = TextAreaField('Body', validators=[Length(max=1024)])
 	submit = SubmitField('Accept')
+

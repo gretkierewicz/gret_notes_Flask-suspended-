@@ -2,11 +2,19 @@
 		{{ note.timestamp.replace(microsecond=0) }} - 
 		
 		<b><a href="{{ url_for('notes', note_id=note.id) }}">{{ note.title }}</a></b> - 
-		({{ note.id }})
+		({{ note.id }}) - 
 		{% if edit_flag == True and note_id == note.id %}
 			<a href="{{ url_for('notes', note_id=note.id) }}">Cancel</a>		
 		{% else %}
 			<a href="{{ url_for('notes', note_id=note.id, edit_flag=True) }}">Edit</a>
+		{% endif %}
+		{% if del_flag == True and note_id == note.id %}
+			<span style="color: red;">Confirm deleting note: </span>  
+			<a href="{{ url_for('del_note', note_id=note.id) }}">Yes</a>
+			/
+			<a href="{{ url_for('notes', note_id=note.id) }}">No</a>
+		{% else %}
+			<a href="{{ url_for('notes', note_id=note.id, del_flag=True) }}">Delete</a>
 		{% endif %}
 	</p>
 	{% if note_id == note.id %}
