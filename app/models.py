@@ -28,6 +28,7 @@ class Note(db.Model):
 	title = db.Column(db.String(128), index=True)
 	body = db.Column(db.String(1024))
 	timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+	update_time = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 	user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
 	def __repr__(self):

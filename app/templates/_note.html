@@ -1,6 +1,4 @@
 	<p>
-		{{ note.timestamp.replace(microsecond=0) }} - 
-		
 		<b><a href="{{ url_for('notes', note_id=note.id) }}">{{ note.title }}</a></b> - 
 		({{ note.id }}) - 
 		{% if edit_flag == True and note_id == note.id %}
@@ -39,4 +37,8 @@
 			</form>
 		{% endif %}
 	{% endif %}
+	<p>
+		Last update: {{ note.update_time.replace(microsecond=0) }} - 
+		Created: {{ note.timestamp.replace(microsecond=0) }}
+	</p>
 	<hr>
