@@ -13,8 +13,8 @@
 				Loged in: {{ current_user.username }}
 				<a href="{{ url_for('logout') }}">Logout</a>
 				<p>
-					<a href="{{ url_for('notes') }}">Notes</a>
-					<a href="{{ url_for('notes', edit_flag=True) }}">New Note</a>
+					<a href="{{ url_for('notes', username=current_user.username) }}">Notes</a>
+					<a href="{{ url_for('notes', username=current_user.username, edit_flag=True) }}">New Note</a>
 				</p>
 			{% endif %}
 		</div>

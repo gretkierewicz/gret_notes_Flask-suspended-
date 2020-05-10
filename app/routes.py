@@ -43,14 +43,14 @@ def register():
 		return redirect(url_for('login'))
 	return render_template('register.html', form=form)
 
-@app.route('/notes', methods=['GET', 'POST'])
+@app.route('/<username>/notes', methods=['GET', 'POST'])
 @login_required
-def notes():
+def notes(username):
 	note_id = request.args.get('note_id', None, type=int)
 	edit_flag = request.args.get('edit_flag', False, type=bool)
 	del_flag = request.args.get('del_flag', False, type=bool)
 
-	user = User.query.filter_by(username=current_user.username).first()
+	user = User.query.filter_by(username=username).first()
 	notes = user.notes.order_by(Note.update_time.desc()).all()
 
 	form = EditNoteForm()
@@ -62,7 +62,7 @@ def notes():
 			db.session.add(note)
 			db.session.commit()
 			flash('Created new note. Title: {}'.format(note.title))
-			return redirect(url_for('notes'))
+			return redirect(url_for('notes', username=current_user.username))
 		elif edit_flag == True and note_id is not None:
 		# edit note
 			note = user.notes.filter_by(id=note_id).first()
@@ -76,10 +76,10 @@ def notes():
 				else:
 					flash('There is no change provided')
 			else:
-				flash('Note not found')
-			return redirect(url_for('notes'))
+				flash('No data found')
+			return redirect(url_for('notes', username=current_user.username))
 		else:
-			return redirect(url_for('notes'))
+			return redirect(url_for('notes', username=current_user.username))
 	elif request.method == 'GET' and note_id is not None and edit_flag == True:
 	# prepare form of selected note
 		note = user.notes.filter_by(id=note_id).first()
@@ -87,7 +87,7 @@ def notes():
 			form.title.data = note.title
 			form.body.data = note.body
 		else:
-			return redirect(url_for('notes'))
+			return redirect(url_for('notes', username=current_user.username))
 
 	return render_template(
 		'notes.html',
@@ -106,5 +106,5 @@ def del_note(note_id):
 		db.session.delete(note)
 		db.session.commit()
 	else:
-		flash('Note not found')
-	return redirect(url_for('notes'))
+		flash('No data found')
+	return redirect(url_for('notes', username=current_user.username))
