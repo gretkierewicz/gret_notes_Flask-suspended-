@@ -74,7 +74,7 @@ def notes():
 					db.session.commit()
 					flash('Saved changes to note. Title: {}'.format(note.title))
 				else:
-				flash('')
+					flash('There is no change provided')
 			else:
 				flash('Note not found')
 			return redirect(url_for('notes'))
