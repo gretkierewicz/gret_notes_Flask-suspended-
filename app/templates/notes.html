@@ -4,23 +4,7 @@
 	<h2>Notes</h2>
 
 	{% if edit_flag == True and note_id is none %}
-		<form action="" method="post" novalidate>
-			{{ form.hidden_tag() }}
-			<p>	
-			{{ form.title.label }}<br>
-			{{ form.title(size=128) }}<br>
-			{% for error in form.title.errors %}
-				<span style="color: red;">[{{ error }}]</span>
-			{% endfor %}
-			</p>
-			<p>
-			{{ form.body(cols=256, rows=6) }}<br>
-			{% for error in form.body.errors %}
-				<span style="color: red;">[{{ error }}]</span>
-			{% endfor %}
-			</p>
-			<p>{{ form.submit() }}</p>
-		</form>
+		{% include '_note_form.html' %}
 	{% endif %}
 
 	{% for note in notes %}

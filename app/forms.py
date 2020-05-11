@@ -34,5 +34,6 @@ class RegistrationForm(FlaskForm):
 class EditNoteForm(FlaskForm):
 	title = StringField('Title', validators=[DataRequired()])
 	body = TextAreaField('Body', validators=[Length(max=1024)])
+	tags = TextAreaField('Tags', validators=[Length(max=1024)])
 	submit = SubmitField('Accept')
 

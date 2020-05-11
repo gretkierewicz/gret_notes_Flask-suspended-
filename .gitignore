@@ -3,3 +3,4 @@
 venv/
 app/logs/
 app.db
+app/.flaskenv
