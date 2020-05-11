@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<h2>Tags</h2>
+	<p>
+		Order by: 
+		<a href="{{ url_for('tags', username=current_user.username, order_by='name') }}">name</a>
+		| 
+		<a href="{{ url_for('tags', username=current_user.username, order_by='timestamp') }}">time</a>
+	</p>
+
+	{% if current_user.username==user.username %}
+		<form action="" method="post" novalidate>
+			{{ new_tags_form.hidden_tag() }}
+			<p>
+			Create tags: 
+			{{ new_tags_form.names(size=64) }}
+			{{ new_tags_form.submit() }}
+			</p>
+		</form>
+	{% endif %}
+
+	{% for tag in user.tags.order_by(order_by) %}
+		<p>
+		{% if tag_id != tag.id %}
+			#{{ tag.name }}
+			<a href="{{ url_for('tags', username=current_user.username, order_by=order_by, tag_id=tag.id) }}">Edit</a>
+			<a href="{{ url_for('del_tag', tag_id=tag.id) }}">Delete</a>
+		{% else %}
+			<form action="" method="post" novalidate>
+				{{ edit_tag_form.hidden_tag() }}
+				Edit: 
+				{{ edit_tag_form.name(size=32) }}
+				{{ edit_tag_form.submit() }}
+				<a href="{{ url_for('tags', username=current_user.username, order_by=order_by) }}">Cancel</a>
+				<a href="{{ url_for('del_tag', tag_id=tag.id) }}">Delete</a>
+			</form>
+		{% endif %}
+		</p>
+	{% endfor %}
+
+{% endblock %}
