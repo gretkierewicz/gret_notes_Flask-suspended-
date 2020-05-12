@@ -6,14 +6,16 @@
 		{% else %}
 			<a href="{{ url_for('notes', username=current_user.username, note_id=note.id, edit_flag=True) }}">Edit</a>
 		{% endif %}
-		{% if del_flag == True and note_id == note.id %}
-			<span style="color: red;">Confirm deleting note: </span>  
+
+		<span id="del_note({{ note.id }})" style="display: inline;">
+			<a href="#" onclick="show_hide('confirm_del_note({{ note.id }})', 'del_note({{ note.id }})'); return false;">Delete</a>
+		</span>
+		<span id="confirm_del_note({{ note.id }})" style="display: none;">
+			Confirm deleting note: 
 			<a href="{{ url_for('del_note', note_id=note.id) }}">Yes</a>
-			/
-			<a href="{{ url_for('notes', username=current_user.username, note_id=note.id) }}">No</a>
-		{% else %}
-			<a href="{{ url_for('notes', username=current_user.username, note_id=note.id, del_flag=True) }}">Delete</a>
-		{% endif %}
+			/ 
+			<a href="#" onclick="show_hide('del_note({{ note.id }})', 'confirm_del_note({{ note.id }})'); return false;">No</a>
+		</span>
 	</p>
 	{% if note_id == note.id %}
 		{% if edit_flag == False %}	

@@ -25,17 +25,28 @@
 		{% if tag_id != tag.id %}
 			#{{ tag.name }}
 			<a href="{{ url_for('tags', username=current_user.username, order_by=order_by, tag_id=tag.id) }}">Edit</a>
-			<a href="{{ url_for('del_tag', tag_id=tag.id) }}">Delete</a>
 		{% else %}
-			<form action="" method="post" novalidate>
+			<form action="" method="post" novalidate style="display: inline;">
 				{{ edit_tag_form.hidden_tag() }}
 				Edit: 
 				{{ edit_tag_form.name(size=32) }}
 				{{ edit_tag_form.submit() }}
 				<a href="{{ url_for('tags', username=current_user.username, order_by=order_by) }}">Cancel</a>
-				<a href="{{ url_for('del_tag', tag_id=tag.id) }}">Delete</a>
 			</form>
 		{% endif %}
+			<span id="del_tag({{ tag.id }})" style="display: inline;">
+				<a href="#" onclick="show_hide('confirm_del_tag({{ tag.id }})', 'del_tag({{ tag.id }})'); return false;">
+					Delete
+				</a>
+			</span>
+			<span id="confirm_del_tag({{ tag.id }})" style="display: none;">
+				Confirm deleting tag: 
+				<a href="{{ url_for('del_tag', tag_id=tag.id) }}">Yes</a>
+				/ 
+				<a href="#" onclick="show_hide('del_tag({{ tag.id }})', 'confirm_del_tag({{ tag.id }})'); return false;">
+					No
+				</a>
+			</span>
 		</p>
 	{% endfor %}
 

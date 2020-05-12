@@ -2,10 +2,13 @@
 
 {% block content %}
 	<h2>Notes</h2>
-
-	{% if edit_flag == True and note_id is none %}
+	<span id="show_note_form" style="display: inline;">
+		<a href="#" onclick="show_hide('note_form', 'show_note_form'); return false;"><b>New note</b></a>
+	</span>
+	<div id="note_form" style="display: none;">
 		{% include '_note_form.html' %}
-	{% endif %}
+		<a href="#" onclick="show_hide('show_note_form', 'note_form'); return false;">Cancel</a>
+	</div>
 
 	{% for note in notes %}
 		{% include '_note.html' %}
