@@ -56,50 +56,59 @@ def register():
 		return redirect(url_for('login'))
 	return render_template('register.html', form=form)
 
+@app.route('/notes', defaults={'username': None})
 @app.route('/<username>/notes', methods=['GET', 'POST'])
 @login_required
 def notes(username):
+	if username == None:
+		username = current_user.username
+
 	note_id = request.args.get('note_id', None, type=int)
+	new_flag = request.args.get('new_flag', False, type=bool)
 	edit_flag = request.args.get('edit_flag', False, type=bool)
-	del_flag = request.args.get('del_flag', False, type=bool)
 
 	user = User.query.filter_by(username=username).first()
 	notes = user.notes.order_by(Note.update_time.desc()).all()
 
 	form = NoteForm()
 
-	if form.validate_on_submit():
-		if edit_flag == True and note_id is None:
-		# create new note
+	if form.validate_on_submit(): 
+		if request.form['submit'] == 'Create':
+		# Creating new note
 			note = Note(title=form.title.data, body=form.body.data, user_id=user.id)
 			db.session.add(note)
 			edit_note_tags(form.tags.data.split(), current_user, note)
 			db.session.commit()
 			flash('Created new note. Title: {}'.format(note.title))
-			return redirect(url_for('notes', username=current_user.username))
-		elif edit_flag == True and note_id is not None:
-		# edit note
-			note = user.notes.filter_by(id=note_id).first()
-			if note is not None:
-				tags = ""
-				for tag in note.tags:
-					tags += tag.name + " "
-				if note.title != form.title.data or note.body != form.body.data or tags != form.tags.data:
-					note.title = form.title.data
-					note.body = form.body.data
-					note.update_time = datetime.utcnow()
-					edit_note_tags(form.tags.data.split(), current_user, note)
-					db.session.commit()
-					flash('Saved changes to note. Title: {}'.format(note.title))
+			return redirect(url_for('notes'))
+
+		elif request.form['submit'] == 'Accept':
+		# Editing existing note
+			if note_id is not None:
+				note = user.notes.filter_by(id=note_id).first()
+				if note is not None:
+					tags = ""
+					for tag in note.tags:
+						tags += tag.name + " "
+					if note.title != form.title.data or note.body != form.body.data or tags != form.tags.data:
+						note.title = form.title.data
+						note.body = form.body.data
+						note.update_time = datetime.utcnow()
+						edit_note_tags(form.tags.data.split(), current_user, note)
+						db.session.commit()
+						flash('Saved changes to note. Title: {}'.format(note.title))
+						redirect(url_for('notes'))
+					else:
+						flash('There is no change provided')
+						redirect(url_for('notes'))
 				else:
-					flash('There is no change provided')
+					flash('No data found')
+					redirect(url_for('notes'))
 			else:
 				flash('No data found')
-			return redirect(url_for('notes', username=current_user.username))
-		else:
-			return redirect(url_for('notes', username=current_user.username))
-	elif request.method == 'GET' and note_id is not None and edit_flag == True:
-	# prepare form for selected note
+				redirect(url_for('notes', username=current_user.username))
+
+	elif note_id is not None and edit_flag == True:
 		note = user.notes.filter_by(id=note_id).first()
 		if note is not None:
 			form.title.data = note.title
@@ -109,15 +118,15 @@ def notes(username):
 				tags += tag.name + " "
 			form.tags.data = tags
 		else:
-			return redirect(url_for('notes', username=current_user.username))
+			flash('No data found')
 
 	return render_template(
 		'notes.html',
 		form=form,
 		notes=notes,
 		note_id=note_id,
-		edit_flag=edit_flag,
-		del_flag=del_flag)
+		new_flag=new_flag,
+		edit_flag=edit_flag)
 
 @app.route('/del_note/<note_id>')
 @login_required
@@ -138,11 +147,11 @@ def tags(username):
 	order_by = request.args.get('order_by', 'name', type=str)
 	tag_id = request.args.get('tag_id', None, type=int)
 
-	new_tags_form = NewTagForm()
-	edit_tag_form = EditTagForm()
+	newTagsForm = NewTagForm()
+	editTagForm = EditTagForm()
 
-	if new_tags_form.validate_on_submit():
-		tag_list = new_tags_form.names.data.split()
+	if newTagsForm.validate_on_submit():
+		tag_list = newTagsForm.names.data.split()
 		list_str = ''
 		for tag_name in tag_list:
 			if user.tags.filter_by(name=tag_name).first() is None:
@@ -151,11 +160,12 @@ def tags(username):
 				list_str += '#' + tag_name + '; '
 		if list_str != '':
 			db.session.commit()
+			newTagsForm.names.data = None
 			flash('Created new tags: {}'.format(list_str))
 
-	elif edit_tag_form.validate_on_submit():
+	elif editTagForm.validate_on_submit():
 		tag = user.tags.filter_by(id=tag_id).first()
-		tag_list = edit_tag_form.name.data.split()
+		tag_list = editTagForm.name.data.split()
 		if tag_list[0] is not None:
 			if user.tags.filter_by(name=tag_list[0]).first()is None:
 				flash('Changed tag name from {old} to {new}'.format(old=tag.name, new=tag_list[0]))
@@ -166,18 +176,18 @@ def tags(username):
 			else:
 				flash('There is such tag already')
 
-	elif request.method == 'GET' and tag_id is not None:
+	if tag_id is not None:
 		tag = user.tags.filter_by(id=tag_id).first()
 		if tag is not None:
-			edit_tag_form.name.data = tag.name
+			editTagForm.name.data = tag.name
 
 	return render_template(
 		'tags.html',
 		user=user,
 		order_by=order_by,
-		new_tags_form=new_tags_form,
+		newTagsForm=newTagsForm,
 		tag_id=tag_id,
-		edit_tag_form=edit_tag_form
+		editTagForm=editTagForm
 	)
 
 @app.route('/del_tag/<tag_id>')

@@ -1,6 +1,5 @@
 	<p>
 		<b><a href="{{ url_for('notes', username=current_user.username, note_id=note.id) }}">{{ note.title }}</a></b> - 
-		({{ note.id }}) - 
 		{% if edit_flag == True and note_id == note.id %}
 			<a href="{{ url_for('notes', username=current_user.username, note_id=note.id) }}">Cancel</a>		
 		{% else %}
@@ -24,11 +23,13 @@
 				{{ "#" + tag.name }}
 			{% endfor %}
 		{% else %}
-			{% include '_note_form.html' %}
+			{% with submit_value = 'Accept' %}
+				{% include '_note_form.html' %}
+			{% endwith %}
 		{% endif %}
+		<p>
+			Last update: {{ note.update_time.replace(microsecond=0) }} - 
+			Created: {{ note.timestamp.replace(microsecond=0) }}
+		</p>
 	{% endif %}
-	<p>
-		Last update: {{ note.update_time.replace(microsecond=0) }} - 
-		Created: {{ note.timestamp.replace(microsecond=0) }}
-	</p>
 	<hr>

@@ -14,11 +14,11 @@
 		{% endfor %}
 		</p>
 		<p>
-		{{ form.tags.label }} (no need to use '#', just separate tags with space)<br>
+		{{ form.tags.label }} (don't use '#', just separate tags with space)<br>
 		{{ form.tags(cols=256, rows=2) }}<br>
 		{% for error in form.tags.errors %}
 			<span style="color: red;">[{{ error }}]</span>
 		{% endfor %}
 		</p>
-		<p>{{ form.submit() }}</p>
+		<p>{{ form.submit(value=submit_value) }}</p>
 	</form>

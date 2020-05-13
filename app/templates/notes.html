@@ -2,13 +2,13 @@
 
 {% block content %}
 	<h2>Notes</h2>
-	<span id="show_note_form" style="display: inline;">
-		<a href="#" onclick="show_hide('note_form', 'show_note_form'); return false;"><b>New note</b></a>
-	</span>
-	<div id="note_form" style="display: none;">
-		{% include '_note_form.html' %}
-		<a href="#" onclick="show_hide('show_note_form', 'note_form'); return false;">Cancel</a>
-	</div>
+	{% if new_flag == False %}
+		<a href="{{ url_for('notes', username=current_user.username, new_flag=True) }}"><b>New note</b></a>
+	{% else %}
+		{% with submit_value = 'Create' %}
+			{% include '_note_form.html' %}
+		{% endwith %}
+	{% endif %}
 
 	{% for note in notes %}
 		{% include '_note.html' %}

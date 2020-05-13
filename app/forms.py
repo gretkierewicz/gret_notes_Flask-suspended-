@@ -35,11 +35,11 @@ class NoteForm(FlaskForm):
 	title = StringField('Title', validators=[DataRequired()])
 	body = TextAreaField('Body', validators=[Length(max=1024)])
 	tags = TextAreaField('Tags', validators=[Length(max=1024)])
-	submit = SubmitField('Accept')
+	submit = SubmitField()
 
 class NewTagForm(FlaskForm):
 	names = StringField('Names', validators=[DataRequired()])
-	submit = SubmitField('Accept')
+	submit = SubmitField('Create')
 
 class EditTagForm(FlaskForm):
 	name = StringField('Name', validators=[DataRequired()])
