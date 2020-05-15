@@ -4,13 +4,13 @@
 	<h2>Tags</h2>
 	<p>
 		Order by: 
-		<a href="{{ url_for('tags', username=current_user.username, order_by='name') }}">name</a>
+		<a href="{{ url_for('tags', username=username, order_by='name') }}">name</a>
 		| 
-		<a href="{{ url_for('tags', username=current_user.username, order_by='timestamp') }}">time</a>
+		<a href="{{ url_for('tags', username=username, order_by='timestamp') }}">time</a>
 	</p>
 
-	{% if current_user.username==user.username %}
-		<form action="" method="post" novalidate>
+	{% if current_user.username==username %}
+		<form action="{{ url_for('tags', order_by=order_by) }}" method="post" novalidate>
 			{{ newTagsForm.hidden_tag() }}
 			<p>
 			Create tags: 
@@ -20,7 +20,7 @@
 		</form>
 	{% endif %}
 
-	{% for tag in user.tags.order_by(order_by) %}
+	{% for tag in tags %}
 		<p>
 		{% if tag_id != tag.id %}
 			#{{ tag.name }}
@@ -41,7 +41,7 @@
 			</span>
 			<span id="confirm_del_tag({{ tag.id }})" style="display: none;">
 				Confirm deleting tag: 
-				<a href="{{ url_for('del_tag', tag_id=tag.id) }}">Yes</a>
+				<a href="{{ url_for('del_tag', tag_id=tag.id, order_by=order_by) }}">Yes</a>
 				/ 
 				<a href="#" onclick="show_hide('del_tag({{ tag.id }})', 'confirm_del_tag({{ tag.id }})'); return false;">
 					No

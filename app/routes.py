@@ -56,7 +56,7 @@ def register():
 		return redirect(url_for('login'))
 	return render_template('register.html', form=form)
 
-@app.route('/notes', defaults={'username': None})
+@app.route('/notes', defaults={'username': None}, methods=['GET', 'POST'])
 @app.route('/<username>/notes', methods=['GET', 'POST'])
 @login_required
 def notes(username):
@@ -72,18 +72,20 @@ def notes(username):
 
 	form = NoteForm()
 
-	if form.validate_on_submit(): 
+	if form.validate_on_submit():
 		if request.form['submit'] == 'Create':
-		# Creating new note
-			note = Note(title=form.title.data, body=form.body.data, user_id=user.id)
+		# Creating new note - allways for current_user
+			new_flag = False
+			note = Note(title=form.title.data, body=form.body.data, user_id=current_user.id)
 			db.session.add(note)
 			edit_note_tags(form.tags.data.split(), current_user, note)
 			db.session.commit()
 			flash('Created new note. Title: {}'.format(note.title))
-			return redirect(url_for('notes'))
+			return redirect(url_for('notes', username=current_user.username))
 
 		elif request.form['submit'] == 'Accept':
 		# Editing existing note
+			edit_flag = False
 			if note_id is not None:
 				note = user.notes.filter_by(id=note_id).first()
 				if note is not None:
@@ -97,18 +99,16 @@ def notes(username):
 						edit_note_tags(form.tags.data.split(), current_user, note)
 						db.session.commit()
 						flash('Saved changes to note. Title: {}'.format(note.title))
-						redirect(url_for('notes'))
 					else:
 						flash('There is no change provided')
-						redirect(url_for('notes'))
 				else:
 					flash('No data found')
-					redirect(url_for('notes'))
 			else:
 				flash('No data found')
-				redirect(url_for('notes', username=current_user.username))
+			redirect(url_for('notes'))
 
 	elif note_id is not None and edit_flag == True:
+	# load data to the edit-form
 		note = user.notes.filter_by(id=note_id).first()
 		if note is not None:
 			form.title.data = note.title
@@ -122,6 +122,7 @@ def notes(username):
 
 	return render_template(
 		'notes.html',
+		username=username,
 		form=form,
 		notes=notes,
 		note_id=note_id,
@@ -137,14 +138,20 @@ def del_note(note_id):
 		db.session.delete(note)
 		db.session.commit()
 	else:
-		flash('No data found')
+		flash("No data found")
 	return redirect(url_for('notes', username=current_user.username))
 
+@app.route('/tags', defaults={'username': None}, methods=['GET', 'POST'])
 @app.route('/<username>/tags', methods=['GET', 'POST'])
 @login_required
 def tags(username):
+	if username is None:
+		username = current_user.username
+
 	user = User.query.filter_by(username=username).first()
-	order_by = request.args.get('order_by', 'name', type=str)
+	order_by = request.args.get('order_by', None, type=str)
+	if order_by != 'name' and order_by != 'timestamp':
+		order_by = 'name'
 	tag_id = request.args.get('tag_id', None, type=int)
 
 	newTagsForm = NewTagForm()
@@ -170,7 +177,7 @@ def tags(username):
 			if user.tags.filter_by(name=tag_list[0]).first()is None:
 				flash('Changed tag name from {old} to {new}'.format(old=tag.name, new=tag_list[0]))
 				tag.name = tag_list[0]
-				#tag.timestamp = datetime.utcnow()
+				tag.timestamp = datetime.utcnow()
 				db.session.commit()
 				tag_id = None
 			else:
@@ -181,23 +188,32 @@ def tags(username):
 		if tag is not None:
 			editTagForm.name.data = tag.name
 
+	if order_by == 'name':
+		tags = user.tags.order_by(Tag.name)
+	else:
+		tags = user.tags.order_by(Tag.timestamp.desc())
+
 	return render_template(
 		'tags.html',
-		user=user,
-		order_by=order_by,
-		newTagsForm=newTagsForm,
-		tag_id=tag_id,
-		editTagForm=editTagForm
+		username=username,
+		tag_id=tag_id, order_by=order_by,
+		newTagsForm=newTagsForm, editTagForm=editTagForm,
+		tags=tags
 	)
 
 @app.route('/del_tag/<tag_id>')
 @login_required
 def del_tag(tag_id):
 	tag = current_user.tags.filter_by(id=tag_id).first()
+	order_by = request.args.get('order_by', None, type=str)
+	if order_by != 'name' and order_by != 'timestamp':
+		order_by = 'name'
+
 	if tag is not None:
 		flash('Deleted tag: {}'.format(tag.name))
 		db.session.delete(tag)
 		db.session.commit()
 	else:
 		flash('No data found')
-	return redirect(url_for('tags', username=current_user.username))
+
+	return redirect(url_for('tags', order_by=order_by))

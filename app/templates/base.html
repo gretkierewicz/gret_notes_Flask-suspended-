@@ -11,20 +11,33 @@
 	</head>
 	<body>
 		<h1>Gret notes</h1>
-		<div>
+
+		<div align="left" style="display: inline-block; width: 49%;">
 			<a href="{{ url_for('index') }}">Home page</a>
+			{% if not current_user.is_anonymous %}
+				<a href="{{ url_for('notes', username=current_user.username) }}">Notes</a>
+				<a href="{{ url_for('tags', username=current_user.username) }}">Tags</a>
+			{% endif %}
+		</div>
+		<div align="right" style="display: inline-block; width: 49%;">
 			{% if current_user.is_anonymous %}
 				<a href="{{ url_for('login') }}">Login</a>
 			{% else %}
-				Loged in: {{ current_user.username }}
-				<a href="{{ url_for('logout') }}">Logout</a>
-				<p>
-					<a href="{{ url_for('notes', username=current_user.username) }}">Notes</a>
-					<a href="{{ url_for('tags', username=current_user.username) }}">Tags</a>
-				</p>
+				[ Logged in: {{ current_user.username }} ]
+				<a href="{{ url_for('logout') }}">Logout</a>	
 			{% endif %}
 		</div>
+
 		<hr>
+		{% if username and username != current_user.username %}
+			[ User: {{ username }} ]
+			{% if not current_user.is_anonymous %}
+				<a href="{{ url_for('notes', username=username) }}">Notes</a>
+				<a href="{{ url_for('tags', username=username) }}">Tags</a>
+			{% endif %}
+			<hr>
+		{% endif %}
+
 		{% with messages = get_flashed_messages() %}
 			{% if messages %}
 			<ul>

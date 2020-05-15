@@ -1,35 +1,37 @@
-	<p>
-		<b><a href="{{ url_for('notes', username=current_user.username, note_id=note.id) }}">{{ note.title }}</a></b> - 
-		{% if edit_flag == True and note_id == note.id %}
-			<a href="{{ url_for('notes', username=current_user.username, note_id=note.id) }}">Cancel</a>		
-		{% else %}
-			<a href="{{ url_for('notes', username=current_user.username, note_id=note.id, edit_flag=True) }}">Edit</a>
-		{% endif %}
+<p>
+	<b><a href="{{ url_for('notes', username=username, note_id=note.id) }}">{{ note.title }}</a></b> - 
+	{% if edit_flag == True and note_id == note.id %}
+		<a href="{{ url_for('notes', username=username, note_id=note.id) }}">Cancel</a>		
+	{% else %}
+		<a href="{{ url_for('notes', username=username, note_id=note.id, edit_flag=True) }}">Edit</a>
+	{% endif %}
 
+	{% if username == current_user.username %}
 		<span id="del_note({{ note.id }})" style="display: inline;">
 			<a href="#" onclick="show_hide('confirm_del_note({{ note.id }})', 'del_note({{ note.id }})'); return false;">Delete</a>
 		</span>
-		<span id="confirm_del_note({{ note.id }})" style="display: none;">
-			Confirm deleting note: 
-			<a href="{{ url_for('del_note', note_id=note.id) }}">Yes</a>
-			/ 
-			<a href="#" onclick="show_hide('del_note({{ note.id }})', 'confirm_del_note({{ note.id }})'); return false;">No</a>
-		</span>
-	</p>
-	{% if note_id == note.id %}
-		{% if edit_flag == False %}	
-			<pre>{{ note.body }}</pre>
-			{% for tag in note.tags %}
-				{{ "#" + tag.name }}
-			{% endfor %}
-		{% else %}
-			{% with submit_value = 'Accept' %}
-				{% include '_note_form.html' %}
-			{% endwith %}
-		{% endif %}
-		<p>
-			Last update: {{ note.update_time.replace(microsecond=0) }} - 
-			Created: {{ note.timestamp.replace(microsecond=0) }}
-		</p>
 	{% endif %}
-	<hr>
+	<span id="confirm_del_note({{ note.id }})" style="display: none;">
+		Confirm deleting note: 
+		<a href="{{ url_for('del_note', note_id=note.id) }}">Yes</a>
+		/ 
+		<a href="#" onclick="show_hide('del_note({{ note.id }})', 'confirm_del_note({{ note.id }})'); return false;">No</a>
+	</span>
+</p>
+{% if note_id == note.id %}
+	{% if edit_flag == False %}	
+		<pre>{{ note.body }}</pre>
+		{% for tag in note.tags %}
+			{{ "#" + tag.name }}
+		{% endfor %}
+	{% else %}
+		{% with submit_value = 'Accept' %}
+			{% include '_note_form.html' %}
+		{% endwith %}
+	{% endif %}
+	<p>
+		Last update: {{ note.update_time.replace(microsecond=0) }} - 
+		Created: {{ note.timestamp.replace(microsecond=0) }}
+	</p>
+{% endif %}
+<hr>

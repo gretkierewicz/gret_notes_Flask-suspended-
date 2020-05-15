@@ -2,9 +2,9 @@
 
 {% block content %}
 	<h2>Notes</h2>
-	{% if new_flag == False %}
+	{% if new_flag == False and username == current_user.username %}
 		<a href="{{ url_for('notes', username=current_user.username, new_flag=True) }}"><b>New note</b></a>
-	{% else %}
+	{% elif new_flag == True %}
 		{% with submit_value = 'Create' %}
 			{% include '_note_form.html' %}
 		{% endwith %}
