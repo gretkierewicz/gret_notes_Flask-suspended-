@@ -18,18 +18,19 @@ Project for personalized notes.
         * [ ] Search notes by tags
     * [ ] Grouping - more organization for your notes (to allow sharing the whole group)
     * [ ] Pinup - fast links to most important/urgent cases
-        * [ ] List by expiration time / priority
+        * [ ] List by set up expiration time or priority
 
-* **User/Teamwork:**
+* **User / Teamwork:**
     * [x] User authorization
-    * [ ] Basic user groups, admin interface
-    * [ ] Sharing content with other users / groups (note/groups/tags/checklists/all)
-    * [ ] Dividing notes into sections with different privileges
+    * [ ] Basic user groups, group owner interface
+    * [ ] Sharing notes with other users 
+        * [ ] Sharing any content with users / groups
+    * [ ] Dividing notes into sections with different privileges / owners for each section
     * [ ] Prioritizing notes / flags / statuses / votes
 
 * **Other:**
-    * [ ] Checklists (stand alone from notes)
-        * [ ] Checklists build into notes
+    * [ ] Checklists / Next step lists (stand alone from notes)
+        * [ ] Checklists / Next step lists - build into notes
     * [ ] Build in system to choose storage place (including local, or local network secure storage for internal purposes)
 
 ## Sources of knowledge:
