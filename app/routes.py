@@ -72,12 +72,27 @@ def notes(username):
     note_id = request.args.get('note_id', None, type=int)
     new_flag = request.args.get('new_flag', False, type=bool)
     edit_flag = request.args.get('edit_flag', False, type=bool)
+    filter_tags = request.args.getlist('filter_tags')
+    if not filter_tags:
+        filter_tags = request.form.getlist('filter_tags')
+        if filter_tags:
+            return redirect(url_for('notes', username=username, filter_tags=filter_tags))
 
     user = User.query.filter_by(username=username).first()
     if user is None:
         return redirect(url_for('notes'))
 
-    notes = user.notes.order_by(Note.update_time.desc()).all()
+    if not filter_tags:
+        notes = user.notes.order_by(Note.update_time.desc()).all()
+    else:
+        notes = []
+        for tag in filter_tags:
+            if user.tags.filter_by(name=tag).first() is not None:
+                notes_tmp = user.tags.filter_by(name=tag).first().notes.all()
+                if notes_tmp is not None:
+                    for note in notes_tmp:
+                        if note not in notes:
+                            notes.append(note)
 
     form = NoteForm()
 
@@ -90,7 +105,7 @@ def notes(username):
             edit_note_tags(form.tags.data.split(), current_user, note)
             db.session.commit()
             flash('Created new note. Title: {}'.format(note.title))
-            return redirect(url_for('notes', username=current_user.username))
+            return redirect(url_for('notes', username=current_user.username, filter_tags=filter_tags))
 
         elif request.form['submit'] == 'Accept':
             # Editing existing note
@@ -114,9 +129,10 @@ def notes(username):
                     flash('No data found')
             else:
                 flash('No data found')
-            redirect(url_for('notes'))
 
-    elif note_id is not None and edit_flag == True:
+            return redirect(url_for('notes', username=username, note_id=note_id, filter_tags=filter_tags))
+
+    elif note_id is not None and edit_flag:
         # load data to the edit-form
         note = user.notes.filter_by(id=note_id).first()
         if note is not None:
@@ -136,20 +152,25 @@ def notes(username):
         notes=notes,
         note_id=note_id,
         new_flag=new_flag,
-        edit_flag=edit_flag)
+        edit_flag=edit_flag,
+        filter_tags=filter_tags)
 
 
 @app.route('/del_note/<note_id>')
 @login_required
 def del_note(note_id):
+    filter_tags = request.args.getlist('filter_tags')
+
     note = current_user.notes.filter_by(id=note_id).first()
     if note is not None:
         flash('Deleted note: {}'.format(note.title))
+        edit_note_tags([], current_user, note)
+        db.session.commit()
         db.session.delete(note)
         db.session.commit()
     else:
         flash("No data found")
-    return redirect(url_for('notes', username=current_user.username))
+    return redirect(url_for('notes', username=current_user.username, filter_tags=filter_tags))
 
 
 @app.route('/tags', defaults={'username': None}, methods=['GET', 'POST'])

@@ -20,24 +20,31 @@
 		</form>
 	{% endif %}
 
+	{% if tag_id is none %}
+	<form method="POST" action="{{ url_for('notes') }}" novalidate>
+	{% endif %}
+
 	{% for tag in tags %}
-		<p>
-		{% if tag_id != tag.id %}
-			#{{ tag.name }}
+		<div>
+			{% if tag_id is none %}
+			<input type="checkbox" name="filter_tags" value="{{ tag.name }}">
+			{% endif %}
+
+			{% if tag_id != tag.id %}
+			<a href="{{ url_for('notes', username=username, filter_tags=[tag.name]) }}">#{{ tag.name }}</a>
 			<a href="{{ url_for('tags', username=current_user.username, order_by=order_by, tag_id=tag.id) }}">Edit</a>
-		{% else %}
+			{% else %}
 			<form action="" method="post" novalidate style="display: inline;">
 				{{ editTagForm.hidden_tag() }}
-				Edit: 
+				Edit:
 				{{ editTagForm.name(size=32) }}
 				{{ editTagForm.submit() }}
 				<a href="{{ url_for('tags', username=current_user.username, order_by=order_by) }}">Cancel</a>
 			</form>
-		{% endif %}
+			{% endif %}
+
 			<span id="del_tag({{ tag.id }})" style="display: inline;">
-				<a href="#" onclick="show_hide('confirm_del_tag({{ tag.id }})', 'del_tag({{ tag.id }})'); return false;">
-					Delete
-				</a>
+				<a href="#" onclick="show_hide('confirm_del_tag({{ tag.id }})', 'del_tag({{ tag.id }})'); return false;">Delete</a>
 			</span>
 			<span id="confirm_del_tag({{ tag.id }})" style="display: none;">
 				Confirm deleting tag: 
@@ -47,7 +54,12 @@
 					No
 				</a>
 			</span>
-		</p>
+		</div><br>
 	{% endfor %}
+
+	{% if tag_id is none %}
+		<button type="submit">Filter notes with checked tags</button>
+	</form>
+	{% endif %}
 
 {% endblock %}

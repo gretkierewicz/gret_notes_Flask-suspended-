@@ -14,8 +14,8 @@ Project for personalized notes.
 * **Notes**
     * [x] Basic notes (new/view/update/delete functions)
     * [x] Tagging - primal organization / search feature
+        * [x] Search notes by tags
         * [ ] Links for fast adding and deleting note's tags
-        * [ ] Search notes by tags
     * [ ] Grouping - more organization for your notes (to allow sharing the whole group)
     * [ ] Pinup - fast links to most important/urgent cases
         * [ ] List by set up expiration time or priority
