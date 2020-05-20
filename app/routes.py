@@ -93,6 +93,7 @@ def notes(username):
                     for note in notes_tmp:
                         if note not in notes:
                             notes.append(note)
+        notes.sort(key=lambda x: x.update_time, reverse=True)
 
     form = NoteForm()
 

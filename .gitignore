@@ -3,5 +3,5 @@
 *.log
 venv/
 app/logs/
-app.db
+app.db*
 app/.flaskenv
