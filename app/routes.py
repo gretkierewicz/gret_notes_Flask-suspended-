@@ -253,3 +253,4 @@ def del_tag(tag_id):
         flash('No data found')
 
     return redirect(url_for('tags', order_by=order_by))
+
