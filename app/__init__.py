@@ -1,5 +1,6 @@
-import logging
 import os
+
+import logging
 from logging.handlers import RotatingFileHandler
 
 from flask import Flask
@@ -15,6 +16,9 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 login = LoginManager(app)
 
+from .errors import errors
+app.register_blueprint(errors.errors_bp)
+
 if not app.debug:
     if not os.path.exists('logs'):
         os.mkdir('logs')
@@ -27,4 +31,4 @@ if not app.debug:
     app.logger.setLevel(logging.INFO)
     app.logger.info('Gret_notes startup')
 
-from app import routes, models, errors
+from app import routes, models
