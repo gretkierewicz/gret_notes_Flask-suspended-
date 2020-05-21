@@ -1,7 +1,9 @@
-.idea*
-*.pyc
-*.log
+.idea/
+logs/
 venv/
-app/logs/
+
 app.db*
-app/.flaskenv
+*.env
+*.flaskenv
+*.log
+*.pyc

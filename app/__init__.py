@@ -16,8 +16,11 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 login = LoginManager(app)
 
-from .errors import errors
-app.register_blueprint(errors.errors_bp)
+from .errors import bp as errors_bp
+app.register_blueprint(errors_bp)
+
+from .auth import bp as auth_bp
+app.register_blueprint(auth_bp)
 
 if not app.debug:
     if not os.path.exists('logs'):
@@ -29,6 +32,6 @@ if not app.debug:
     app.logger.addHandler(file_handler)
 
     app.logger.setLevel(logging.INFO)
-    app.logger.info('Gret_notes startup')
+    app.logger.info('gret_notes startup')
 
 from app import routes, models

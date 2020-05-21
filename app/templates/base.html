@@ -21,10 +21,10 @@
 		</div>
 		<div align="right" style="display: inline-block; width: 49%;">
 			{% if current_user.is_anonymous %}
-				<a href="{{ url_for('login') }}">Login</a>
+				<a href="{{ url_for('auth_bp.login') }}">Login</a>
 			{% else %}
 				[ Logged in: {{ current_user.username }} ]
-				<a href="{{ url_for('logout') }}">Logout</a>	
+				<a href="{{ url_for('auth_bp.logout') }}">Logout</a>
 			{% endif %}
 		</div>
 

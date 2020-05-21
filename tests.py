@@ -3,6 +3,7 @@ from app.models import User, Note, Tag
 from datetime import datetime, timedelta
 import unittest
 
+
 class UserModelCase(unittest.TestCase):
 	def setUp(self):
 		# in-memory SQLite database
@@ -40,6 +41,7 @@ class UserModelCase(unittest.TestCase):
 		self.assertTrue(n.is_tagged(t2))
 		self.assertEqual(n.tags.count(), 1)
 		self.assertEqual(n.tags.first().name, 'tag2')
+
 
 if __name__ == '__main__':
 	unittest.main(verbosity=2)
