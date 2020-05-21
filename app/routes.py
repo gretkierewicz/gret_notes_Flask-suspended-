@@ -6,20 +6,6 @@ from flask import render_template, flash, redirect, url_for, request
 from flask_login import current_user, login_user, logout_user, login_required
 
 
-def edit_note_tags(tags_list, user, note):
-    for tag_name in tags_list:  # look for tags to add
-        tag = user.tags.filter_by(name=tag_name).first()
-        if tag is None:
-            tag = Tag(name=tag_name, user_id=user.id)
-            note.tags.append(tag)
-        else:
-            if not note.is_tagged(tag):
-                note.tags.append(tag)
-    for tag in note.tags:  # look for tags to remove
-        if not tag.name in tags_list:
-            note.tags.remove(tag)
-
-
 @app.route('/')
 @app.route('/index')
 def index():
@@ -103,8 +89,7 @@ def notes(username):
             new_flag = False
             note = Note(title=form.title.data, body=form.body.data, user_id=current_user.id)
             db.session.add(note)
-            edit_note_tags(form.tags.data.split(), current_user, note)
-            db.session.commit()
+            note.edit_tags(form.tags.data.split())
             flash('Created new note. Title: {}'.format(note.title))
             return redirect(url_for('notes', username=current_user.username, filter_tags=filter_tags))
 
@@ -121,8 +106,7 @@ def notes(username):
                         note.title = form.title.data
                         note.body = form.body.data
                         note.update_time = datetime.utcnow()
-                        edit_note_tags(form.tags.data.split(), current_user, note)
-                        db.session.commit()
+                        note.edit_tags(form.tags.data.split())
                         flash('Saved changes to note. Title: {}'.format(note.title))
                     else:
                         flash('There is no change provided')
@@ -165,8 +149,7 @@ def del_note(note_id):
     note = current_user.notes.filter_by(id=note_id).first()
     if note is not None:
         flash('Deleted note: {}'.format(note.title))
-        edit_note_tags([], current_user, note)
-        db.session.commit()
+        note.edit_tags([])
         db.session.delete(note)
         db.session.commit()
     else:

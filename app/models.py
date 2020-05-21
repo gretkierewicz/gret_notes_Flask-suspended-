@@ -39,8 +39,8 @@ class Note(db.Model):
     body = db.Column(db.String(1024))
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     update_time = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    tags = db.relationship('Tag', secondary=note_tag, backref='tags', lazy='dynamic')
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))   # backref in User: owner
+    tags = db.relationship('Tag', secondary=note_tag, lazy='dynamic')
 
     def __repr__(self):
         return '<Note {}>'.format(self.title)
@@ -56,13 +56,27 @@ class Note(db.Model):
     def is_tagged(self, tag):
         return self.tags.filter(note_tag.c.tag_id == tag.id).count() > 0
 
+    def edit_tags(self, tags_list):
+        for tag in self.tags:  # look for tags to remove
+            if tag.name not in tags_list:
+                self.tags.remove(tag)
+        for tag_name in tags_list:  # look for tags to add
+            tag = self.owner.tags.filter_by(name=tag_name).first()
+            if tag is None:
+                tag = Tag(name=tag_name, user_id=self.owner.id)
+                self.tags.append(tag)
+            else:
+                if not self.is_tagged(tag):
+                    self.tags.append(tag)
+        db.session.commit()
+
 
 class Tag(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    notes = db.relationship('Note', secondary=note_tag, backref='notes', lazy='dynamic')
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))   # backref in User: owner
+    notes = db.relationship('Note', secondary=note_tag, lazy='dynamic')
 
     def __repr__(self):
         return '<Tag {}>'.format(self.name)
