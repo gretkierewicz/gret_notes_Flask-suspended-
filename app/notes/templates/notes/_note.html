@@ -1,9 +1,9 @@
 <p>
-	<b><a href="{{ url_for('notes', username=username, note_id=note.id, filter_tags=filter_tags) }}">{{ note.title }}</a></b> -
+	<b><a href="{{ url_for('.notes', username=username, note_id=note.id, filter_tags=filter_tags) }}">{{ note.title }}</a></b> -
 	{% if edit_flag == True and note_id == note.id %}
-		<a href="{{ url_for('notes', username=username, note_id=note.id, filter_tags=filter_tags) }}">Cancel</a>
+		<a href="{{ url_for('.notes', username=username, note_id=note.id, filter_tags=filter_tags) }}">Cancel</a>
 	{% else %}
-		<a href="{{ url_for('notes', username=username, note_id=note.id, edit_flag=True, filter_tags=filter_tags) }}">Edit</a>
+		<a href="{{ url_for('.notes', username=username, note_id=note.id, edit_flag=True, filter_tags=filter_tags) }}">Edit</a>
 	{% endif %}
 
 	{% if username == current_user.username %}
@@ -13,7 +13,7 @@
 	{% endif %}
 	<span id="confirm_del_note({{ note.id }})" style="display: none;">
 		Confirm deleting note: 
-		<a href="{{ url_for('del_note', note_id=note.id, filter_tags=filter_tags) }}">Yes</a>
+		<a href="{{ url_for('.del_note', note_id=note.id, filter_tags=filter_tags) }}">Yes</a>
 		/ 
 		<a href="#" onclick="show_hide('del_note({{ note.id }})', 'confirm_del_note({{ note.id }})'); return false;">No</a>
 	</span>
@@ -26,7 +26,7 @@
 		{% endfor %}
 	{% else %}
 		{% with submit_value = 'Accept' %}
-			{% include '_note_form.html' %}
+			{% include 'notes/_note_form.html' %}
 		{% endwith %}
 	{% endif %}
 	<p>

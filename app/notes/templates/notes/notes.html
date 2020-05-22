@@ -12,16 +12,16 @@
 
 	<p>
 	{% if new_flag == False and username == current_user.username %}
-		<a href="{{ url_for('notes', username=current_user.username, new_flag=True, filter_tags=filter_tags) }}"><b>New note</b></a>
+		<a href="{{ url_for('.notes', username=current_user.username, new_flag=True, filter_tags=filter_tags) }}"><b>New note</b></a>
 	{% elif new_flag == True %}
 		{% with submit_value = 'Create' %}
-			{% include '_note_form.html' %}
+			{% include 'notes/_note_form.html' %}
 		{% endwith %}
 	{% endif %}
 	</p>
 
 	{% for note in notes %}
-		{% include '_note.html' %}
+		{% include 'notes/_note.html' %}
 	{% endfor %}
 
 {% endblock %}

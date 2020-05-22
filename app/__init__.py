@@ -18,9 +18,10 @@ login = LoginManager(app)
 
 from .errors import bp as errors_bp
 app.register_blueprint(errors_bp)
-
 from .auth import bp as auth_bp
 app.register_blueprint(auth_bp)
+from .notes import bp as notes_bp
+app.register_blueprint(notes_bp)
 
 if not app.debug:
     if not os.path.exists('logs'):

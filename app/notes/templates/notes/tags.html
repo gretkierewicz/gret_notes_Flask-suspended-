@@ -4,13 +4,13 @@
 	<h2>Tags</h2>
 	<p>
 		Order by: 
-		<a href="{{ url_for('tags', username=username, order_by='name') }}">name</a>
+		<a href="{{ url_for('.tags', username=username, order_by='name') }}">name</a>
 		| 
-		<a href="{{ url_for('tags', username=username, order_by='timestamp') }}">time</a>
+		<a href="{{ url_for('.tags', username=username, order_by='timestamp') }}">time</a>
 	</p>
 
 	{% if current_user.username==username %}
-		<form action="{{ url_for('tags', order_by=order_by) }}" method="post" novalidate>
+		<form action="{{ url_for('.tags', order_by=order_by) }}" method="post" novalidate>
 			{{ newTagsForm.hidden_tag() }}
 			<p>
 			Create tags: 
@@ -21,7 +21,7 @@
 	{% endif %}
 
 	{% if tag_id is none %}
-	<form method="POST" action="{{ url_for('notes') }}" novalidate>
+	<form method="POST" action="{{ url_for('.notes') }}" novalidate>
 	{% endif %}
 
 	{% for tag in tags %}
@@ -31,15 +31,15 @@
 			{% endif %}
 
 			{% if tag_id != tag.id %}
-			<a href="{{ url_for('notes', username=username, filter_tags=[tag.name]) }}">#{{ tag.name }}</a>
-			<a href="{{ url_for('tags', username=current_user.username, order_by=order_by, tag_id=tag.id) }}">Edit</a>
+			<a href="{{ url_for('.notes', username=username, filter_tags=[tag.name]) }}">#{{ tag.name }}</a>
+			<a href="{{ url_for('.tags', username=current_user.username, order_by=order_by, tag_id=tag.id) }}">Edit</a>
 			{% else %}
 			<form action="" method="post" novalidate style="display: inline;">
 				{{ editTagForm.hidden_tag() }}
 				Edit:
 				{{ editTagForm.name(size=32) }}
 				{{ editTagForm.submit() }}
-				<a href="{{ url_for('tags', username=current_user.username, order_by=order_by) }}">Cancel</a>
+				<a href="{{ url_for('.tags', username=current_user.username, order_by=order_by) }}">Cancel</a>
 			</form>
 			{% endif %}
 
@@ -48,7 +48,7 @@
 			</span>
 			<span id="confirm_del_tag({{ tag.id }})" style="display: none;">
 				Confirm deleting tag: 
-				<a href="{{ url_for('del_tag', tag_id=tag.id, order_by=order_by) }}">Yes</a>
+				<a href="{{ url_for('.del_tag', tag_id=tag.id, order_by=order_by) }}">Yes</a>
 				/ 
 				<a href="#" onclick="show_hide('del_tag({{ tag.id }})', 'confirm_del_tag({{ tag.id }})'); return false;">
 					No

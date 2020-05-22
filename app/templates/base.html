@@ -15,8 +15,8 @@
 		<div align="left" style="display: inline-block; width: 49%;">
 			<a href="{{ url_for('index') }}">Home page</a>
 			{% if not current_user.is_anonymous %}
-				<a href="{{ url_for('notes', username=current_user.username) }}">Notes</a>
-				<a href="{{ url_for('tags', username=current_user.username) }}">Tags</a>
+				<a href="{{ url_for('notes_bp.notes', username=current_user.username) }}">Notes</a>
+				<a href="{{ url_for('notes_bp.tags', username=current_user.username) }}">Tags</a>
 			{% endif %}
 		</div>
 		<div align="right" style="display: inline-block; width: 49%;">
@@ -32,8 +32,8 @@
 		{% if username and username != current_user.username %}
 			[ User: {{ username }} ]
 			{% if not current_user.is_anonymous %}
-				<a href="{{ url_for('notes', username=username) }}">Notes</a>
-				<a href="{{ url_for('tags', username=username) }}">Tags</a>
+				<a href="{{ url_for('notes_bp.notes', username=username) }}">Notes</a>
+				<a href="{{ url_for('notes_bp.tags', username=username) }}">Tags</a>
 			{% endif %}
 			<hr>
 		{% endif %}
