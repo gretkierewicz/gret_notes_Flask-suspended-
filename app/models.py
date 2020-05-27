@@ -56,7 +56,11 @@ class Note(db.Model):
     def is_tagged(self, tag):
         return self.tags.filter(note_tag.c.tag_id == tag.id).count() > 0
 
-    def edit_tags(self, tags_list):
+    def edit_tags_with_list(self, tags_list):
+        """
+        Edit tags providing list of tags in string format.
+        :param tags_list: List of tags in string format
+        """
         for tag in self.tags:  # look for tags to remove
             if tag.name not in tags_list:
                 self.tags.remove(tag)

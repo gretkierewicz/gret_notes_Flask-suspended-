@@ -23,7 +23,9 @@ def notes(username):
     if not filter_tags:
         filter_tags = request.form.getlist('filter_tags')
         if filter_tags:
-            return redirect(url_for('.notes', username=username, filter_tags=filter_tags))
+            return redirect(url_for('.notes',
+                                    username=username,
+                                    filter_tags=filter_tags))
 
     user = User.query.filter_by(username=username).first()
     if user is None:
@@ -49,9 +51,12 @@ def notes(username):
             # Creating new note - always for current_user
             note = Note(title=form.title.data, body=form.body.data, user_id=current_user.id)
             db.session.add(note)
-            note.edit_tags(form.tags.data.split())
+            note.edit_tags_with_list(form.tags.data.split())
             flash('Created new note. Title: {}'.format(note.title))
-            return redirect(url_for('.notes', username=current_user.username, new_flag=False, filter_tags=filter_tags))
+            return redirect(url_for('.notes',
+                                    username=current_user.username,
+                                    new_flag=False,
+                                    filter_tags=filter_tags))
 
         elif request.form['submit'] == 'Accept':
             # Edit existing note
@@ -65,7 +70,7 @@ def notes(username):
                         note.title = form.title.data
                         note.body = form.body.data
                         note.update_time = datetime.utcnow()
-                        note.edit_tags(form.tags.data.split())
+                        note.edit_tags_with_list(form.tags.data.split())
                         flash('Saved changes to note. Title: {}'.format(note.title))
                         return redirect(url_for('.notes',
                                                 username=username,
@@ -114,12 +119,14 @@ def del_note(note_id):
     note = current_user.notes.filter_by(id=note_id).first()
     if note is not None:
         flash('Deleted note: {}'.format(note.title))
-        note.edit_tags([])
+        note.edit_tags_with_list([])
         db.session.delete(note)
         db.session.commit()
     else:
         flash("No data found")
-    return redirect(url_for('.notes', username=current_user.username, filter_tags=filter_tags))
+    return redirect(url_for('.notes',
+                            username=current_user.username,
+                            filter_tags=filter_tags))
 
 
 @bp.route('/tags', defaults={'username': None}, methods=['GET', 'POST'])
@@ -177,13 +184,11 @@ def tags(username):
     else:
         tags = user.tags.order_by(Tag.timestamp.desc())
 
-    return render_template(
-        'notes/tags.html',
-        username=username,
-        tag_id=tag_id, order_by=order_by,
-        newTagsForm=new_tags_form, editTagForm=edit_tag_form,
-        tags=tags
-    )
+    return render_template('notes/tags.html',
+                           username=username,
+                           tag_id=tag_id, order_by=order_by,
+                           newTagsForm=new_tags_form, editTagForm=edit_tag_form,
+                           tags=tags)
 
 
 @bp.route('/del_tag/<tag_id>')
@@ -201,4 +206,5 @@ def del_tag(tag_id):
     else:
         flash('No data found')
 
-    return redirect(url_for('.tags', order_by=order_by))
+    return redirect(url_for('.tags',
+                            order_by=order_by))

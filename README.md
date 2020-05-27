@@ -2,6 +2,10 @@
 
 Project for personalized notes.
 
+## Test-site on the pythoneverywhere server:
+
+http://gret.pythonanywhere.com
+
 ## Idea:
 
  App for notes with option to make it fast and ergonomic.
@@ -33,13 +37,18 @@ Project for personalized notes.
         * [ ] Checklists / Next step lists - build into notes
     * [ ] Build in system to choose storage place (including local, or local network secure storage for internal purposes)
 
+## DB model:
+
+![Image od DB model](https://i.ibb.co/Q6b5Tj1/DB-model.png)
+
 ## Sources of knowledge:
 
 * Started with: https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world
-
+* https://ondras.zarovi.cz/sql/demo/ - DB modeling online
 * https://docs.python.org/3.6/
     * https://flask.palletsprojects.com
     * https://www.sqlalchemy.org
     * https://wtforms.readthedocs.io
-
-* https://stackoverflow.com for minor features (like JS function)
+* https://stackoverflow.com - fixes and minor features (like JS)
+* https://realpython.com
+* https://hackersandslackers.com
