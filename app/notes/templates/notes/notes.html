@@ -11,9 +11,9 @@
 	{% endif %}
 
 	<p>
-	{% if new_flag == False and username == current_user.username %}
-		<a href="{{ url_for('.notes', username=current_user.username, new_flag=True, filter_tags=filter_tags) }}"><b>New note</b></a>
-	{% elif new_flag == True %}
+	{% if flag != 'new' and username == current_user.username %}
+		<a href="{{ url_for('.notes', username=current_user.username, flag='new', filter_tags=filter_tags) }}"><b>New note</b></a>
+	{% elif flag == 'new' %}
 		{% with submit_value = 'Create' %}
 			{% include 'notes/_note_form.html' %}
 		{% endwith %}

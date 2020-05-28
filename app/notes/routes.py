@@ -17,8 +17,7 @@ def notes(username):
         username = current_user.username
 
     note_id = request.args.get('note_id', None, type=int)
-    new_flag = request.args.get('new_flag', False, type=bool)
-    edit_flag = request.args.get('edit_flag', False, type=bool)
+    flag = request.args.get('flag', None, type=str)
     filter_tags = request.args.getlist('filter_tags')
     if not filter_tags:
         filter_tags = request.form.getlist('filter_tags')
@@ -55,7 +54,7 @@ def notes(username):
             flash('Created new note. Title: {}'.format(note.title))
             return redirect(url_for('.notes',
                                     username=current_user.username,
-                                    new_flag=False,
+                                    flag=None,
                                     filter_tags=filter_tags))
 
         elif request.form['submit'] == 'Accept':
@@ -81,13 +80,13 @@ def notes(username):
                         return redirect(url_for('.notes',
                                                 username=username,
                                                 note_id=note_id,
-                                                edit_flag=True,
+                                                flag='edit',
                                                 filter_tags=filter_tags))
 
             flash('No data found')
             return redirect(url_for('.notes'))
 
-    elif note_id is not None and edit_flag:
+    elif note_id is not None and flag == 'edit':
         # load data to the edit-form
         note = user.notes.filter_by(id=note_id).first()
         if note is not None:
@@ -100,15 +99,13 @@ def notes(username):
         else:
             flash('No data found')
 
-    return render_template(
-        'notes/notes.html',
-        username=username,
-        form=form,
-        notes=notes,
-        note_id=note_id,
-        new_flag=new_flag,
-        edit_flag=edit_flag,
-        filter_tags=filter_tags)
+    return render_template('notes/notes.html',
+                           username=username,
+                           form=form,
+                           notes=notes,
+                           note_id=note_id,
+                           flag=flag,
+                           filter_tags=filter_tags)
 
 
 @bp.route('/del_note/<note_id>')

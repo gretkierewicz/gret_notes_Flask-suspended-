@@ -1,9 +1,9 @@
 <p>
 	<b><a href="{{ url_for('.notes', username=username, note_id=note.id, filter_tags=filter_tags) }}">{{ note.title }}</a></b> -
-	{% if edit_flag == True and note_id == note.id %}
+	{% if flag == 'edit' and note_id == note.id %}
 		<a href="{{ url_for('.notes', username=username, note_id=note.id, filter_tags=filter_tags) }}">Cancel</a>
 	{% else %}
-		<a href="{{ url_for('.notes', username=username, note_id=note.id, edit_flag=True, filter_tags=filter_tags) }}">Edit</a>
+		<a href="{{ url_for('.notes', username=username, note_id=note.id, flag='edit', filter_tags=filter_tags) }}">Edit</a>
 	{% endif %}
 
 	{% if username == current_user.username %}
@@ -19,15 +19,15 @@
 	</span>
 </p>
 {% if note_id == note.id %}
-	{% if edit_flag == False %}	
+	{% if flag == 'edit' %}
+		{% with submit_value = 'Accept' %}
+			{% include 'notes/_note_form.html' %}
+		{% endwith %}
+	{% else %}
 		<pre>{{ note.body }}</pre>
 		{% for tag in note.tags %}
 			{{ "#" + tag.name }}
 		{% endfor %}
-	{% else %}
-		{% with submit_value = 'Accept' %}
-			{% include 'notes/_note_form.html' %}
-		{% endwith %}
 	{% endif %}
 	<p>
 		Last update: {{ note.update_time.replace(microsecond=0) }} - 
