@@ -13,6 +13,15 @@ from flask_login import current_user, login_required
 @bp.route('/<username>/notes', methods=['GET', 'POST'])
 @login_required
 def notes(username):
+    """
+    Display selected user notes, create new or edit existing one.
+    Possible args:
+    note_id - selected note ID (int)
+    flag - 'new' or 'edit' to select proper form (str)
+    filter_tags - list of tags in string form (list of str)
+    :param username: selects user to filter notes
+    :return: render or redirect to notes.html
+    """
     if username is None:
         username = current_user.username
 
@@ -45,9 +54,10 @@ def notes(username):
 
     form = NoteForm()
 
+    # POST method - until other types are implemented
     if form.validate_on_submit():
+        # New note form validation - create new only with current_user as owner
         if request.form['submit'] == 'Create':
-            # Creating new note - always for current_user
             note = Note(title=form.title.data, body=form.body.data, user_id=current_user.id)
             db.session.add(note)
             note.edit_tags_with_list(form.tags.data.split())
@@ -57,8 +67,8 @@ def notes(username):
                                     flag=None,
                                     filter_tags=filter_tags))
 
+        # Edit note form validation
         elif request.form['submit'] == 'Accept':
-            # Edit existing note
             if note_id is not None:
                 note = user.notes.filter_by(id=note_id).first()
                 if note is not None:
@@ -86,6 +96,7 @@ def notes(username):
             flash('No data found')
             return redirect(url_for('.notes'))
 
+    # GET method - with conditions
     elif note_id is not None and flag == 'edit':
         # load data to the edit-form
         note = user.notes.filter_by(id=note_id).first()
@@ -99,6 +110,7 @@ def notes(username):
         else:
             flash('No data found')
 
+    # GET method - except conditions above
     return render_template('notes/notes.html',
                            username=username,
                            form=form,
@@ -111,6 +123,12 @@ def notes(username):
 @bp.route('/del_note/<note_id>')
 @login_required
 def del_note(note_id):
+    """
+    Delete note with ID given.
+    Only possible to delete user's own notes.
+    :param note_id: note's ID reference
+    :return: redirect to notes.html
+    """
     filter_tags = request.args.getlist('filter_tags')
 
     note = current_user.notes.filter_by(id=note_id).first()
@@ -130,12 +148,20 @@ def del_note(note_id):
 @bp.route('/<username>/tags', methods=['GET', 'POST'])
 @login_required
 def tags(username):
+    """
+    Display selected user tags, create new or edit existing one.
+    Possible args:
+    tag_id - id of selected tag ID (int)
+    order_by - 'name' or 'timestamp' ordering type (str)
+    :param username: selects user to filter tags
+    :return: render or redirect to tags.html
+    """
     if username is None:
         username = current_user.username
 
     user = User.query.filter_by(username=username).first()
     if user is None:
-        return redirect(url_for('tags'))
+        return redirect(url_for('.tags'))
 
     order_by = request.args.get('order_by', None, type=str)
     if order_by != 'name' and order_by != 'timestamp':
@@ -145,6 +171,7 @@ def tags(username):
     new_tags_form = NewTagForm()
     edit_tag_form = EditTagForm()
 
+    # POST method with NEW tag
     if new_tags_form.validate_on_submit():
         tag_list = new_tags_form.names.data.split()
         list_str = ''
@@ -158,6 +185,7 @@ def tags(username):
             new_tags_form.names.data = None
             flash('Created new tags: {}'.format(list_str))
 
+    # POST method with EDITed tag
     elif edit_tag_form.validate_on_submit():
         tag = user.tags.filter_by(id=tag_id).first()
         tag_list = edit_tag_form.name.data.split()
@@ -171,6 +199,7 @@ def tags(username):
             else:
                 flash('There is such tag already')
 
+    # GET method
     if tag_id is not None:
         tag = user.tags.filter_by(id=tag_id).first()
         if tag is not None:
@@ -191,6 +220,12 @@ def tags(username):
 @bp.route('/del_tag/<tag_id>')
 @login_required
 def del_tag(tag_id):
+    """
+    Delete tag with ID given.
+    Only possible to delete user's own tags.
+    :param tag_id: tag's ID reference
+    :return: redirect to tags.html
+    """
     tag = current_user.tags.filter_by(id=tag_id).first()
     order_by = request.args.get('order_by', None, type=str)
     if order_by != 'name' and order_by != 'timestamp':

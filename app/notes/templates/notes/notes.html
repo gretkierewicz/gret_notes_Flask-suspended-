@@ -24,4 +24,13 @@
 		{% include 'notes/_note.html' %}
 	{% endfor %}
 
+	<!-- this way it doesn't work for some reason!
+	<script type="text/javascript" src="{{ url_for('.static', filename='notes/js/scripts.js') }}"></script>
+	-->
+	<script type="text/javascript" >
+		function show_hide(show_id, hide_id){
+			document.getElementById(show_id).style.display = 'inline';
+			document.getElementById(hide_id).style.display = 'none';
+    }
+	</script>
 {% endblock %}
